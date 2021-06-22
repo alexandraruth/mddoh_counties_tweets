@@ -1,5 +1,6 @@
 ##### Group project: MD County Health Department COVID-19 tweets
 
+setwd("~/Documents/GitHub/mddoh_counties_tweets")
 
 #### Approach ----
 
@@ -30,32 +31,46 @@ library(rtweet)
 
 
 # get md county twitter handles csv file into a dataframe
-x <- read_csv("https://raw.githubusercontent.com/CivilServiceUSA/us-governors/master/us-governors/data/us-governors.csv")
+dat <- read_csv("https://raw.githubusercontent.com/alexandraruth/mddoh_counties_tweets/main/mddoh_counties.csv")
 
-# get governor twitter handles into a vector
+# get MD DOH county twitter handles into a vector
 
-gov_handles <- as.vector(x$twitter_handle)
+mddoh_handles <- as.vector(dat$`Twitter handle`)
 
-#### Set up academic twitter API use ----
+# remove values that don't have handles
+mddoh_handles <- mddoh_handles[!is.na(mddoh_handles)]
 
-bearer_token <- "<insert token>"
+# remove the @ sign from the vector
 
-#### Get tweets about masks within specified timeframe
+mddoh_handles <- sub('@', '', mddoh_handles)
 
-gov_tweets <- get_user_tweets(gov_handles,  # users object 
+#### Get tweets from MD county health departments ----
+
+# input academic twitter API bearer token
+
+bearer_token <- "<token>"
+
+#### Query twitter API with md doh twitter handles
+
+mddoh_tweets <- get_user_tweets(mddoh_handles,  # users object 
                               start_tweets = "2021-01-01T00:00:00Z", # start date
-                              end_tweets = "2021-06-15T00:00:00Z", # end date
+                              end_tweets = "2021-06-22T00:00:00Z", # end date
                               bearer_token = bearer_token, # bearer token 
-                              file = "gov_tweets" # data path where JSON files will be stored 
+                              file = "mddoh_tweets"
 )
 
 
-# subset and create a new data frame with only mask tweets
-gov_mask_tweets <- gov_tweets %>%
-  filter(grepl("mask", text))
+mddoh_tweets <- get_user_tweets("@pgchealth",  # users object 
+                                start_tweets = "2021-01-01T00:00:00Z", # start date
+                                end_tweets = "2021-06-22T00:00:00Z", # end date
+                                bearer_token = bearer_token, # bearer token 
+                                file = "mddoh_tweets"
+)
+
 
 #list out first 20 tweets
-head(gov_mask_tweets$text, 20)
+
+
 
 
 #### 
